@@ -89,7 +89,7 @@ fun FiltersScreen(
             ) {
                 items(state.value.filters!!, { it.id }) {
                     Tile(
-                        buildString {
+                        title = buildString {
                             append("/")
                             append(it.regexPattern)
                             append("/")
@@ -100,18 +100,18 @@ fun FiltersScreen(
                                 append("/")
                             }
                         },
-                        it.action.verb(),
-                        if (it.app == Any) stringResource(R.string.any_app)
+                        content = it.action.verb(),
+                        leading = if (it.app == Any) stringResource(R.string.any_app)
                         else it.app.name.getFirst(30),
-                        if (!it.enabled) stringResource(R.string.filter_disabled)
+                        trailing = if (!it.enabled) stringResource(R.string.filter_disabled)
                         else if (!it.historyEnabled) stringResource(R.string.history_disabled)
                         else pluralStringResource(R.plurals.hit, it.hits, it.hits),
-                        it.schedule.description,
-                        {
+                        preContent = it.schedule.description,
+                        onClick = {
                             if (viewModel.selectedFilter == it) viewModel.selectedFilter = null
                             else viewModel.selectedFilter = it
                         },
-                        {
+                        buttons = {
                             IconButton(
                                 {
                                     viewModel.dialogState = FilterDialogState.TOGGLE_HISTORY
@@ -157,8 +157,8 @@ fun FiltersScreen(
                                 )
                             }
                         },
-                        viewModel.selectedFilter == it,
-                        true,
+                        expanded = viewModel.selectedFilter == it,
+                        dividerBetweenTitleAndContent = true,
                     )
                 }
                 item { Box(Modifier.height(100.dp)) {} }

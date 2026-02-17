@@ -1,15 +1,31 @@
 package co.adityarajput.notifilter.views.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -26,6 +42,7 @@ import co.adityarajput.notifilter.views.components.AppBar
 import co.adityarajput.notifilter.views.components.ManageHistoryDialog
 import co.adityarajput.notifilter.views.components.Tile
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(
     goBack: () -> Unit,
@@ -68,40 +85,77 @@ fun NotificationsScreen(
                     .fillMaxSize(),
             ) {
                 items(state.value.notifications!!, { it.id }) {
-                    Tile(
-                        it.title,
-                        it.content,
-                        it.origin.getFirst(30),
-                        it.timestamp.toShortHumanReadableTime(),
-                        null,
-                        {
-                            if (viewModel.selectedNotification == it) viewModel.selectedNotification =
-                                null
-                            else viewModel.selectedNotification = it
-                        },
-                        {
-                            TextButton(
-                                { viewModel.openNotification(context, it) },
-                                colors = ButtonDefaults.textButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.primary,
-                                ),
-                            ) {
-                                Text(stringResource(R.string.open))
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { value ->
+                            if (value == SwipeToDismissBoxValue.EndToStart) {
+                                viewModel.delete(it)
+                                true
+                            } else {
+                                false
                             }
-                            IconButton(
-                                { viewModel.delete(it) },
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.tertiary,
-                                ),
+                        }
+                    )
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        enableDismissFromStartToEnd = false,
+                        backgroundContent = {
+                            val color = when (dismissState.dismissDirection) {
+                                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                                else -> Color.Transparent
+                            }
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(dimensionResource(R.dimen.padding_small))
+                                    .background(color, MaterialTheme.shapes.medium),
+                                contentAlignment = Alignment.CenterEnd
                             ) {
                                 Icon(
-                                    painterResource(R.drawable.delete),
-                                    stringResource(R.string.delete),
+                                    Icons.Filled.Delete,
+                                    contentDescription = stringResource(R.string.delete),
+                                    modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_large)),
+                                    tint = MaterialTheme.colorScheme.onErrorContainer
                                 )
                             }
-                        },
-                        viewModel.selectedNotification == it,
-                    )
+                        }
+                    ) {
+                        Tile(
+                            it.title,
+                            it.content,
+                            it.origin.getFirst(30),
+                            it.timestamp.toShortHumanReadableTime(),
+                            null,
+                            onClick = { viewModel.openNotification(context, it) },
+                            onLongClick = {
+                                if (viewModel.selectedNotification == it) viewModel.selectedNotification =
+                                    null
+                                else viewModel.selectedNotification = it
+                            },
+                            buttons = {
+                                TextButton(
+                                    { viewModel.openNotification(context, it) },
+                                    colors = ButtonDefaults.textButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.primary,
+                                    ),
+                                ) {
+                                    Text(stringResource(R.string.open))
+                                }
+                                IconButton(
+                                    { viewModel.delete(it) },
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.tertiary,
+                                    ),
+                                ) {
+                                    Icon(
+                                        painterResource(R.drawable.delete),
+                                        stringResource(R.string.delete),
+                                    )
+                                }
+                            },
+                            expanded = viewModel.selectedNotification == it,
+                        )
+                    }
                 }
             }
         }
