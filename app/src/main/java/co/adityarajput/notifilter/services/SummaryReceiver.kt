@@ -62,7 +62,7 @@ class SummaryReceiver : BroadcastReceiver() {
         )
 
         val notification = NotificationCompat.Builder(context, Constants.SUMMARY_NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.summary_notification_title))
             .setContentText(context.getString(R.string.summary_notification_content, count))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
