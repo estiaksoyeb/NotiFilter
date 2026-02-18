@@ -126,16 +126,8 @@ fun NotificationsScreen(
                                     Modifier
                                         .fillMaxSize()
                                         .padding(dimensionResource(R.dimen.padding_small))
-                                        .background(color, MaterialTheme.shapes.medium),
-                                    contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) Alignment.CenterStart else Alignment.CenterEnd
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Delete,
-                                        contentDescription = stringResource(R.string.delete),
-                                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_large)),
-                                        tint = MaterialTheme.colorScheme.onErrorContainer
-                                    )
-                                }
+                                        .background(color, MaterialTheme.shapes.medium)
+                                )
                             }
                         ) {
                             Tile(
