@@ -34,7 +34,7 @@ import kotlinx.serialization.json.Json
 @Composable
 fun FiltersScreen(
     goToUpsertFilterScreen: (String) -> Unit,
-    goToNotificationsScreen: () -> Unit,
+    goBack: () -> Unit,
     goToSettingsScreen: () -> Unit,
     viewModel: FiltersViewModel = viewModel(factory = Provider.Factory),
 ) {
@@ -42,18 +42,11 @@ fun FiltersScreen(
 
     Scaffold(
         topBar = {
-            AppBar(stringResource(R.string.app_name), false) {
+            AppBar(stringResource(R.string.app_name), true, goBack) {
                 IconButton(goToSettingsScreen) {
                     Icon(
                         painterResource(R.drawable.settings),
                         stringResource(R.string.settings),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-                IconButton(goToNotificationsScreen) {
-                    Icon(
-                        painterResource(R.drawable.history),
-                        stringResource(R.string.history),
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }

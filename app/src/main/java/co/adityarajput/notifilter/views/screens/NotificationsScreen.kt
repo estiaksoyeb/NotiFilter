@@ -49,7 +49,8 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(
-    goBack: () -> Unit,
+    goToFiltersScreen: () -> Unit,
+    goToSettingsScreen: () -> Unit,
     viewModel: NotificationsViewModel = viewModel(factory = Provider.Factory),
 ) {
     val state = viewModel.state.collectAsState()
@@ -57,7 +58,21 @@ fun NotificationsScreen(
 
     Scaffold(
         topBar = {
-            AppBar(stringResource(R.string.history), true, goBack) {
+            AppBar(stringResource(R.string.history), false) {
+                IconButton(goToSettingsScreen) {
+                    Icon(
+                        painterResource(R.drawable.settings),
+                        stringResource(R.string.settings),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                IconButton(goToFiltersScreen) {
+                    Icon(
+                        painterResource(R.drawable.list_alt),
+                        stringResource(R.string.add_filter),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
                 IconButton({ viewModel.dialogState = NotificationDialogState.CLEAR_HISTORY }) {
                     Icon(
                         painterResource(R.drawable.clear_all),

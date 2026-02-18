@@ -26,14 +26,14 @@ fun Navigator(controller: NavHostController, intent: Intent? = null) {
     NavHost(
         controller,
         when {
-            hasPermission -> Routes.FILTERS.name
+            hasPermission -> Routes.NOTIFICATIONS.name
             else -> Routes.ONBOARDING.name
         },
     ) {
         composable(Routes.ONBOARDING.name) {
             OnboardingScreen {
                 controller.navigate(
-                    Routes.FILTERS.name,
+                    Routes.NOTIFICATIONS.name,
                     NavOptions.Builder().setPopUpTo(Routes.ONBOARDING.name, true).build(),
                 )
             }
@@ -41,7 +41,7 @@ fun Navigator(controller: NavHostController, intent: Intent? = null) {
         composable(Routes.FILTERS.name) {
             FiltersScreen(
                 { controller.navigate(UpsertFilterRoute(it)) },
-                { controller.navigate(Routes.NOTIFICATIONS.name) },
+                controller::popBackStack,
                 { controller.navigate(Routes.SETTINGS.name) },
             )
         }
@@ -51,7 +51,12 @@ fun Navigator(controller: NavHostController, intent: Intent? = null) {
                 controller::popBackStack,
             )
         }
-        composable(Routes.NOTIFICATIONS.name) { NotificationsScreen(controller::popBackStack) }
+        composable(Routes.NOTIFICATIONS.name) { 
+            NotificationsScreen(
+                { controller.navigate(Routes.FILTERS.name) },
+                { controller.navigate(Routes.SETTINGS.name) }
+            ) 
+        }
         composable(Routes.SETTINGS.name) {
             SettingsScreen(
                 { controller.navigate(Routes.ABOUT.name) },
