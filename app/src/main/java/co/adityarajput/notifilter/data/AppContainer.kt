@@ -2,9 +2,19 @@ package co.adityarajput.notifilter.data
 
 import android.content.Context
 import co.adityarajput.notifilter.data.models.*
+import co.adityarajput.notifilter.utils.SummaryScheduler
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+
+@Serializable
+data class Backup(
+    val filters: List<Filter>,
+    val schedules: List<SummarySchedule> = emptyList()
+)
 
 class AppContainer(private val context: Context) {
     val repository: Repository by lazy {
@@ -15,12 +25,38 @@ class AppContainer(private val context: Context) {
         )
     }
 
-    suspend fun export() =
-        Json.encodeToString<List<Filter>>(repository.filters().first())
+    suspend fun export(): String {
+        val filters = repository.filters().first()
+        val schedules = repository.summarySchedules().first()
+        return Json.encodeToString(Backup(filters, schedules))
+    }
 
     suspend fun import(json: String) {
+        val element = Json.parseToJsonElement(json)
+        val backup = if (element is JsonArray) {
+            // Legacy format: Array of Filters
+            Backup(filters = Json.decodeFromString<List<Filter>>(json))
+        } else {
+            // New format: Backup object
+            Json.decodeFromString<Backup>(json)
+        }
+
         repository.deleteFilters()
-        repository.upsert(*Json.decodeFromString<Array<Filter>>(json))
+        repository.upsert(*backup.filters.toTypedArray())
+        
+        // Handle schedules
+        // Clear old ones first (optional, but consistent with deleteFilters)
+        val oldSchedules = repository.summarySchedules().first()
+        oldSchedules.forEach { 
+            repository.delete(it) 
+            SummaryScheduler.cancel(context, it.id)
+        }
+        
+        repository.upsert(*backup.schedules.map { it.copy(id = 0) }.toTypedArray())
+        
+        // Reschedule alarms
+        val newSchedules = repository.summarySchedules().first()
+        SummaryScheduler.scheduleAll(context, repository, newSchedules)
     }
 
     fun seedDemoData() {
