@@ -138,6 +138,8 @@
     <string name="summary_notification_content">You have %1$d notifications to check.</string>
     <string name="scheduled_summaries">Scheduled Summaries</string>
     <string name="add_summary_schedule">Add Summary Schedule</string>
+    <string name="summary_notification_permission_warning">NotiFilter needs permission to show summary notifications.</string>
+    <string name="summary_alarm_permission_warning">NotiFilter needs permission to schedule exact alarms for summaries.</string>
 
     <string-array name="days_initials">
         <item>S</item>

@@ -1,13 +1,13 @@
 package co.adityarajput.notifilter.views.screens
 
 import android.annotation.SuppressLint
+import android.app.TimePickerDialog
 import android.content.ClipData
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.app.TimePickerDialog
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,11 +41,14 @@ import co.adityarajput.notifilter.R
 import co.adityarajput.notifilter.data.AppContainer
 import co.adityarajput.notifilter.services.NotificationListener
 import co.adityarajput.notifilter.utils.Logger
+import co.adityarajput.notifilter.utils.hasExactAlarmPermission
+import co.adityarajput.notifilter.utils.hasPostNotificationsPermission
 import co.adityarajput.notifilter.utils.hasUnrestrictedBackgroundUsagePermission
 import co.adityarajput.notifilter.viewmodels.Provider
 import co.adityarajput.notifilter.viewmodels.SummaryViewModel
 import co.adityarajput.notifilter.views.Theme
 import co.adityarajput.notifilter.views.components.AppBar
+import co.adityarajput.notifilter.views.components.ErrorText
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -68,23 +71,17 @@ fun SettingsScreen(
 
     val schedules by summaryViewModel.schedules.collectAsState()
 
-    val timePickerDialog = TimePickerDialog(
-        context,
-        { _, hourOfDay, minute ->
-            summaryViewModel.addSchedule(hourOfDay * 60 + minute)
-        },
-        12, 0, false
-    )
-
-    var isInvincible by remember {
-        mutableStateOf(context.hasUnrestrictedBackgroundUsagePermission())
-    }
+    var hasNotificationPermission by remember { mutableStateOf(context.hasPostNotificationsPermission()) }
+    var hasAlarmPermission by remember { mutableStateOf(context.hasExactAlarmPermission()) }
+    var isInvincible by remember { mutableStateOf(context.hasUnrestrictedBackgroundUsagePermission()) }
     var isRunningInForeground by remember {
         mutableStateOf(sharedPreferences.getBoolean(RUN_IN_FOREGROUND, false))
     }
 
     val watcher = object : Runnable {
         override fun run() {
+            hasNotificationPermission = context.hasPostNotificationsPermission()
+            hasAlarmPermission = context.hasExactAlarmPermission()
             isInvincible = context.hasUnrestrictedBackgroundUsagePermission()
             handler.postDelayed(this, 1000)
         }
@@ -93,6 +90,14 @@ fun SettingsScreen(
         handler.post(watcher)
         onDispose { handler.removeCallbacksAndMessages(null) }
     }
+
+    val timePickerDialog = TimePickerDialog(
+        context,
+        { _, hourOfDay, minute ->
+            summaryViewModel.addSchedule(hourOfDay * 60 + minute)
+        },
+        12, 0, false
+    )
 
     Scaffold(
         topBar = { AppBar(stringResource(R.string.settings), true, goBack) },
@@ -130,6 +135,43 @@ fun SettingsScreen(
                         )
                         IconButton({ timePickerDialog.show() }) {
                             Icon(Icons.Default.Add, stringResource(R.string.add_summary_schedule))
+                        }
+                    }
+
+                    if (!hasNotificationPermission || !hasAlarmPermission) {
+                        Column(
+                            Modifier.padding(horizontal = dimensionResource(R.dimen.padding_large)),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            if (!hasNotificationPermission) {
+                                ErrorText(R.string.summary_notification_permission_warning)
+                                Button(
+                                    onClick = {
+                                        context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                        })
+                                    },
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                ) {
+                                    Text(stringResource(R.string.grant_permission))
+                                }
+                            }
+                            if (!hasAlarmPermission) {
+                                ErrorText(R.string.summary_alarm_permission_warning)
+                                Button(
+                                    onClick = {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                            context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                                                data = "package:${context.packageName}".toUri()
+                                            })
+                                        }
+                                    },
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                ) {
+                                    Text(stringResource(R.string.grant_permission))
+                                }
+                            }
+                            Spacer(Modifier.height(8.dp))
                         }
                     }
 
