@@ -18,6 +18,7 @@
 
 package co.adityarajput.notifilter
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
                     Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    NotiFilter()
+                    NotiFilter(intent = intent)
                 }
             }
         }
@@ -52,6 +53,9 @@ class MainActivity : ComponentActivity() {
 
 @Preview
 @Composable
-fun NotiFilter(navController: NavHostController = rememberNavController()) {
-    Navigator(navController)
+fun NotiFilter(
+    navController: NavHostController = rememberNavController(),
+    intent: Intent? = null,
+) {
+    Navigator(navController, intent)
 }

@@ -1,6 +1,8 @@
 package co.adityarajput.notifilter.views
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
@@ -12,8 +14,14 @@ import co.adityarajput.notifilter.views.screens.*
 import kotlinx.serialization.Serializable
 
 @Composable
-fun Navigator(controller: NavHostController) {
+fun Navigator(controller: NavHostController, intent: Intent? = null) {
     val hasPermission = remember { controller.context.hasNotificationListenerPermission() }
+
+    LaunchedEffect(intent) {
+        if (intent?.getStringExtra("navigate_to") == "history") {
+            controller.navigate(Routes.NOTIFICATIONS.name)
+        }
+    }
 
     NavHost(
         controller,

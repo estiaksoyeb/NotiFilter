@@ -12,6 +12,7 @@ object Provider {
     val Factory = viewModelFactory {
         initializer { FiltersViewModel(notifilterApplication().container.repository) }
         initializer { NotificationsViewModel(notifilterApplication().container.repository) }
+        initializer { SummaryViewModel(notifilterApplication().container.repository, notifilterApplication()) }
     }
 
     fun createUFVM(filterString: String) = viewModelFactory {

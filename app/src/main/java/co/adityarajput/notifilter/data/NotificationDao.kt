@@ -18,6 +18,9 @@ interface NotificationDao {
     @Query("SELECT COUNT(*) FROM notifications")
     suspend fun count(): Int
 
+    @Query("SELECT COUNT(*) FROM notifications WHERE timestamp > :since")
+    suspend fun countSince(since: Long): Int
+
     @Delete
     suspend fun delete(notification: Notification)
 

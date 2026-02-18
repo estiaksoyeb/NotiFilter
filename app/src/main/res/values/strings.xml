@@ -134,6 +134,10 @@
     <string name="alttext_info">Info</string>
 
     <string name="foreground_notification_content">NotiFilter is running</string>
+    <string name="summary_notification_title">NotiFilter Summary</string>
+    <string name="summary_notification_content">You have %1$d notifications to check.</string>
+    <string name="scheduled_summaries">Scheduled Summaries</string>
+    <string name="add_summary_schedule">Add Summary Schedule</string>
 
     <string-array name="days_initials">
         <item>S</item>

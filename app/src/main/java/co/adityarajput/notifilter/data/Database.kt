@@ -7,10 +7,11 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import co.adityarajput.notifilter.data.models.Filter
 import co.adityarajput.notifilter.data.models.Notification
+import co.adityarajput.notifilter.data.models.SummarySchedule
 
 @Database(
-    entities = [Filter::class, Notification::class],
-    version = 11,
+    entities = [Filter::class, Notification::class, SummarySchedule::class],
+    version = 12,
     autoMigrations = [
         AutoMigration(1, 2), AutoMigration(2, 3), AutoMigration(3, 4),
         AutoMigration(4, 5), AutoMigration(5, 6),
@@ -22,6 +23,7 @@ import co.adityarajput.notifilter.data.models.Notification
 abstract class NotiFilterDatabase : RoomDatabase() {
     abstract fun filterDao(): FilterDao
     abstract fun notificationDao(): NotificationDao
+    abstract fun summaryDao(): SummaryDao
 
     @DeleteTable("active_notifications")
     class DeleteTableAN : AutoMigrationSpec
@@ -98,10 +100,24 @@ abstract class NotiFilterDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS summary_schedules (
+                        time INTEGER NOT NULL,
+                        enabled INTEGER NOT NULL,
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
         fun getDatabase(context: Context): NotiFilterDatabase {
             return instance ?: synchronized(this) {
                 Room.databaseBuilder(context, NotiFilterDatabase::class.java, "notifilter_database")
-                    .addMigrations(MIGRATION_9_10, MIGRATION_10_11)
+                    .addMigrations(MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
                     .build().also { instance = it }
             }
         }

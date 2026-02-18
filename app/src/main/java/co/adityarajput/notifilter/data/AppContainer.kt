@@ -11,6 +11,7 @@ class AppContainer(private val context: Context) {
         Repository(
             NotiFilterDatabase.getDatabase(context).filterDao(),
             NotiFilterDatabase.getDatabase(context).notificationDao(),
+            NotiFilterDatabase.getDatabase(context).summaryDao(),
         )
     }
 

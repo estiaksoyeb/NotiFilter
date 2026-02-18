@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.app.TimePickerDialog
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -15,6 +16,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,8 +31,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import co.adityarajput.notifilter.Constants.RUN_IN_FOREGROUND
 import co.adityarajput.notifilter.Constants.SETTINGS
 import co.adityarajput.notifilter.R
@@ -36,18 +42,22 @@ import co.adityarajput.notifilter.data.AppContainer
 import co.adityarajput.notifilter.services.NotificationListener
 import co.adityarajput.notifilter.utils.Logger
 import co.adityarajput.notifilter.utils.hasUnrestrictedBackgroundUsagePermission
+import co.adityarajput.notifilter.viewmodels.Provider
+import co.adityarajput.notifilter.viewmodels.SummaryViewModel
 import co.adityarajput.notifilter.views.Theme
 import co.adityarajput.notifilter.views.components.AppBar
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @SuppressLint("BatteryLife")
 @Composable
 fun SettingsScreen(
     goToAboutScreen: () -> Unit = {},
     goBack: () -> Unit = {},
+    summaryViewModel: SummaryViewModel = viewModel(factory = Provider.Factory)
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -55,6 +65,16 @@ fun SettingsScreen(
     val appContainer = remember { AppContainer(context) }
     val handler = remember { Handler(Looper.getMainLooper()) }
     val sharedPreferences = remember { context.getSharedPreferences(SETTINGS, MODE_PRIVATE) }
+
+    val schedules by summaryViewModel.schedules.collectAsState()
+
+    val timePickerDialog = TimePickerDialog(
+        context,
+        { _, hourOfDay, minute ->
+            summaryViewModel.addSchedule(hourOfDay * 60 + minute)
+        },
+        12, 0, false
+    )
 
     var isInvincible by remember {
         mutableStateOf(context.hasUnrestrictedBackgroundUsagePermission())
@@ -89,6 +109,53 @@ fun SettingsScreen(
                 Arrangement.Top,
                 Alignment.CenterHorizontally,
             ) {
+                Card(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.padding_small)),
+                ) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                dimensionResource(R.dimen.padding_large),
+                                dimensionResource(R.dimen.padding_medium),
+                            ),
+                        Arrangement.SpaceBetween,
+                        Alignment.CenterVertically
+                    ) {
+                        Text(
+                            stringResource(R.string.scheduled_summaries),
+                            fontWeight = FontWeight.Medium,
+                        )
+                        IconButton({ timePickerDialog.show() }) {
+                            Icon(Icons.Default.Add, stringResource(R.string.add_summary_schedule))
+                        }
+                    }
+
+                    schedules.forEach { schedule ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = dimensionResource(R.dimen.padding_large), vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Switch(schedule.enabled, { summaryViewModel.toggleSchedule(schedule) })
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    String.format(Locale.getDefault(), "%02d:%02d", schedule.time / 60, schedule.time % 60),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                            IconButton({ summaryViewModel.deleteSchedule(schedule) }) {
+                                Icon(Icons.Default.Delete, stringResource(R.string.delete), tint = MaterialTheme.colorScheme.error)
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(dimensionResource(R.dimen.padding_medium)))
+                }
                 Card(
                     Modifier
                         .fillMaxWidth()
