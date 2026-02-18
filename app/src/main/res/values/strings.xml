@@ -110,6 +110,7 @@
     <string name="open">Open</string>
 
     <string name="history">History</string>
+    <string name="configurations">Configurations</string>
     <string name="no_notifications">No notifications blocked yet.</string>
 
     <string name="clear_history">Clear history</string>

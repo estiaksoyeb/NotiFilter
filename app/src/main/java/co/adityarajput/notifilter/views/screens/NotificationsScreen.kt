@@ -58,7 +58,7 @@ fun NotificationsScreen(
 
     Scaffold(
         topBar = {
-            AppBar(stringResource(R.string.history), false) {
+            AppBar(stringResource(R.string.app_name), false) {
                 IconButton(goToSettingsScreen) {
                     Icon(
                         painterResource(R.drawable.settings),

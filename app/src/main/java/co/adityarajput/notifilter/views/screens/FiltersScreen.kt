@@ -42,7 +42,7 @@ fun FiltersScreen(
 
     Scaffold(
         topBar = {
-            AppBar(stringResource(R.string.app_name), true, goBack) {
+            AppBar(stringResource(R.string.configurations), true, goBack) {
                 IconButton(goToSettingsScreen) {
                     Icon(
                         painterResource(R.drawable.settings),
