@@ -87,7 +87,7 @@ fun NotificationsScreen(
                 items(state.value.notifications!!, { it.id }) {
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { value ->
-                            if (value == SwipeToDismissBoxValue.EndToStart) {
+                            if (value != SwipeToDismissBoxValue.Settled) {
                                 viewModel.delete(it)
                                 true
                             } else {
@@ -98,10 +98,11 @@ fun NotificationsScreen(
 
                     SwipeToDismissBox(
                         state = dismissState,
-                        enableDismissFromStartToEnd = false,
+                        enableDismissFromStartToEnd = true,
                         backgroundContent = {
-                            val color = when (dismissState.dismissDirection) {
+                            val color = when (dismissState.targetValue) {
                                 SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                                SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.errorContainer
                                 else -> Color.Transparent
                             }
                             Box(
@@ -109,12 +110,12 @@ fun NotificationsScreen(
                                     .fillMaxSize()
                                     .padding(dimensionResource(R.dimen.padding_small))
                                     .background(color, MaterialTheme.shapes.medium),
-                                contentAlignment = Alignment.CenterEnd
+                                contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) Alignment.CenterStart else Alignment.CenterEnd
                             ) {
                                 Icon(
                                     Icons.Filled.Delete,
                                     contentDescription = stringResource(R.string.delete),
-                                    modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_large)),
+                                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_large)),
                                     tint = MaterialTheme.colorScheme.onErrorContainer
                                 )
                             }
