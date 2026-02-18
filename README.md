@@ -4,16 +4,21 @@
 
 **Silence annoying notifications, stay in control.**
 
-NotiFilter is a powerful, privacy-focused notification manager that listens to all device notifications and quietly manages those that match your custom filters. This fork introduces several advanced features to make your notification history more interactive and useful.
+NotiFilter is a powerful, privacy-focused notification manager that listens to all device notifications and quietly manages them according to your custom filters. This fork introduces several advanced features to make your notification history more interactive and useful.
 
 [<img src="https://github.com/user-attachments/assets/713d71c5-3dec-4ec4-a3f2-8d28d025a9c6" alt="Get it on Obtainium" height="80">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/estiaksoyeb/NotiFilter)
+
+## Screenshots
+
+<img alt="NotiFilter Home (History)" src="metadata/en-US/images/phoneScreenshots/1.png" width=30%> <img alt="NotiFilter Configurations" src="metadata/en-US/images/phoneScreenshots/2.png" width=30%> <img alt="NotiFilter Scheduled Summaries" src="metadata/en-US/images/phoneScreenshots/3.png" width=30%>
 
 ## What's New in This Fork?
 
 This version (v5.0.0+) builds upon the original NotiFilter with several powerful additions:
 
+- **History-First Interface** - The app now opens directly to your Notification History, acting as a functional inbox for all filtered alerts.
 - **Actionable History** - Don't just block notifications; interact with them. You can now tap on any blocked notification in the history screen to open the original app or trigger the intended action.
-- **Scheduled Summaries** - Instead of getting distracted throughout the day, receive a "Digest" of all blocked notifications at your preferred times (e.g., morning and evening).
+- **Scheduled Summaries** - Instead of getting distracted throughout the day, receive a "Digest" of all blocked notifications at your preferred times. Configure multiple schedules in settings.
 - **Modern Interactions** - Smooth, bidirectional swipe-to-delete gestures in the History screen with fluid animations.
 - **UI Refinements** - Clean, system-native typography and improved status bar icons for better visibility.
 - **Persistence** - Improved reliability with auto-resume after device reboots.
@@ -38,10 +43,6 @@ This version (v5.0.0+) builds upon the original NotiFilter with several powerful
     - No ads, trackers, or internet access 🆓
     - Licensed under the [GPLv3](LICENSE) 📃
     - Fully offline; your data never leaves your device 🔐
-
-## Screenshots
-
-<img alt="NotiFilter screenshot: filters screen" src="metadata/en-US/images/phoneScreenshots/1.png" width=30%> <img alt="NotiFilter screenshot: block history" src="metadata/en-US/images/phoneScreenshots/2.png" width=30%>
 
 ## Installation
 
