@@ -117,11 +117,11 @@ fun NotificationsScreen(
                             state = dismissState,
                             enableDismissFromStartToEnd = true,
                             backgroundContent = {
-                                val color = when (dismissState.targetValue) {
-                                    SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
-                                    SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.errorContainer
-                                    else -> Color.Transparent
-                                }
+                            val color = if (isDismissed) Color.Transparent else when (dismissState.targetValue) {
+                                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                                SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.errorContainer
+                                else -> Color.Transparent
+                            }
                                 Box(
                                     Modifier
                                         .fillMaxSize()
