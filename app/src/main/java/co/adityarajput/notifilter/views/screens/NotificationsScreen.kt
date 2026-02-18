@@ -1,5 +1,9 @@
 package co.adityarajput.notifilter.views.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,8 +25,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +44,7 @@ import co.adityarajput.notifilter.viewmodels.Provider
 import co.adityarajput.notifilter.views.components.AppBar
 import co.adityarajput.notifilter.views.components.ManageHistoryDialog
 import co.adityarajput.notifilter.views.components.Tile
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,10 +89,12 @@ fun NotificationsScreen(
                     .fillMaxSize(),
             ) {
                 items(state.value.notifications!!, { it.id }) {
+                    var isDismissed by remember { mutableStateOf(false) }
+
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { value ->
                             if (value != SwipeToDismissBoxValue.Settled) {
-                                viewModel.delete(it)
+                                isDismissed = true
                                 true
                             } else {
                                 false
@@ -96,66 +102,78 @@ fun NotificationsScreen(
                         }
                     )
 
-                    SwipeToDismissBox(
-                        state = dismissState,
-                        enableDismissFromStartToEnd = true,
-                        backgroundContent = {
-                            val color = when (dismissState.targetValue) {
-                                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
-                                SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.errorContainer
-                                else -> Color.Transparent
-                            }
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(dimensionResource(R.dimen.padding_small))
-                                    .background(color, MaterialTheme.shapes.medium),
-                                contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) Alignment.CenterStart else Alignment.CenterEnd
-                            ) {
-                                Icon(
-                                    Icons.Filled.Delete,
-                                    contentDescription = stringResource(R.string.delete),
-                                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_large)),
-                                    tint = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                            }
+                    LaunchedEffect(isDismissed) {
+                        if (isDismissed) {
+                            delay(300)
+                            viewModel.delete(it)
                         }
+                    }
+
+                    AnimatedVisibility(
+                        visible = !isDismissed,
+                        exit = shrinkVertically(tween(300)) + fadeOut()
                     ) {
-                        Tile(
-                            it.title,
-                            it.content,
-                            it.origin.getFirst(30),
-                            it.timestamp.toShortHumanReadableTime(),
-                            null,
-                            onClick = { viewModel.openNotification(context, it) },
-                            onLongClick = {
-                                if (viewModel.selectedNotification == it) viewModel.selectedNotification =
-                                    null
-                                else viewModel.selectedNotification = it
-                            },
-                            buttons = {
-                                TextButton(
-                                    { viewModel.openNotification(context, it) },
-                                    colors = ButtonDefaults.textButtonColors(
-                                        contentColor = MaterialTheme.colorScheme.primary,
-                                    ),
-                                ) {
-                                    Text(stringResource(R.string.open))
+                        SwipeToDismissBox(
+                            state = dismissState,
+                            enableDismissFromStartToEnd = true,
+                            backgroundContent = {
+                                val color = when (dismissState.targetValue) {
+                                    SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                                    SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.errorContainer
+                                    else -> Color.Transparent
                                 }
-                                IconButton(
-                                    { viewModel.delete(it) },
-                                    colors = IconButtonDefaults.iconButtonColors(
-                                        contentColor = MaterialTheme.colorScheme.tertiary,
-                                    ),
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .padding(dimensionResource(R.dimen.padding_small))
+                                        .background(color, MaterialTheme.shapes.medium),
+                                    contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) Alignment.CenterStart else Alignment.CenterEnd
                                 ) {
                                     Icon(
-                                        painterResource(R.drawable.delete),
-                                        stringResource(R.string.delete),
+                                        Icons.Filled.Delete,
+                                        contentDescription = stringResource(R.string.delete),
+                                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_large)),
+                                        tint = MaterialTheme.colorScheme.onErrorContainer
                                     )
                                 }
-                            },
-                            expanded = viewModel.selectedNotification == it,
-                        )
+                            }
+                        ) {
+                            Tile(
+                                it.title,
+                                it.content,
+                                it.origin.getFirst(30),
+                                it.timestamp.toShortHumanReadableTime(),
+                                null,
+                                onClick = { viewModel.openNotification(context, it) },
+                                onLongClick = {
+                                    if (viewModel.selectedNotification == it) viewModel.selectedNotification =
+                                        null
+                                    else viewModel.selectedNotification = it
+                                },
+                                buttons = {
+                                    TextButton(
+                                        { viewModel.openNotification(context, it) },
+                                        colors = ButtonDefaults.textButtonColors(
+                                            contentColor = MaterialTheme.colorScheme.primary,
+                                        ),
+                                    ) {
+                                        Text(stringResource(R.string.open))
+                                    }
+                                    IconButton(
+                                        { viewModel.delete(it) },
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            contentColor = MaterialTheme.colorScheme.tertiary,
+                                        ),
+                                    ) {
+                                        Icon(
+                                            painterResource(R.drawable.delete),
+                                            stringResource(R.string.delete),
+                                        )
+                                    }
+                                },
+                                expanded = viewModel.selectedNotification == it,
+                            )
+                        }
                     }
                 }
             }
