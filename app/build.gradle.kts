@@ -18,8 +18,8 @@ android {
         applicationId = "com.estiaksoyeb.notifilter"
         minSdk = 29
         targetSdk = 36
-        versionCode = 22
-        versionName = "5.0.0"
+        versionCode = 23
+        versionName = "5.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

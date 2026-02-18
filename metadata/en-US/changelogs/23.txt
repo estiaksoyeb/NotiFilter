@@ -1,0 +1,7 @@
+- History-First Interface: The app now opens directly to your Notification History.
+- Actionable History: Tap notifications in history to open the original app.
+- Scheduled Summaries: Receive a digest of blocked notifications at your preferred times.
+- Modern Interactions: Smooth, bidirectional swipe-to-delete with fluid animations.
+- UI Refinements: Clean, system-native typography and improved status bar icons.
+- Persistence: Improved reliability with auto-resume after device reboots.
+- Combined Backup: Export/Import now includes both filters and summary schedules.

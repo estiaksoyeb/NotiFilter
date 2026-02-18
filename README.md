@@ -14,7 +14,7 @@ NotiFilter is a powerful, privacy-focused notification manager that listens to a
 
 ## What's New in This Fork?
 
-This version (v5.0.0+) builds upon the original NotiFilter with several powerful additions:
+This version (v5.1.0+) builds upon the original NotiFilter with several powerful additions:
 
 - **History-First Interface** - The app now opens directly to your Notification History, acting as a functional inbox for all filtered alerts.
 - **Actionable History** - Don't just block notifications; interact with them. You can now tap on any blocked notification in the history screen to open the original app or trigger the intended action.
