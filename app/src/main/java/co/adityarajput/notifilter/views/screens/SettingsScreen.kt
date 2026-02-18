@@ -12,6 +12,9 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -49,6 +52,7 @@ import co.adityarajput.notifilter.viewmodels.SummaryViewModel
 import co.adityarajput.notifilter.views.Theme
 import co.adityarajput.notifilter.views.components.AppBar
 import co.adityarajput.notifilter.views.components.ErrorText
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
